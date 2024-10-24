@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <meta charset="UTF-8">
+  <title>cryptoZombies(FrontEnd)</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script language="javascript" type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+  <script language="javascript" type="text/javascript" src="cryptozombies_abi.js"></script>
+
+</head>
+<style>
+  body{background-image : url('Images/BGI.png');
+  /* background-image: url("your_image_src"); */
+    background-repeat: no-repeat;
+    background-size: 100% 100%; 
+    height: 1000px;
+  }
+</style>
+<body>
+
+  <div style="flex-direction: column;">
+    <div id="txStatus"></div>
+    <div id="zombies" class="row-flex" style="display: flex;margin-top: 332px;color: white;"></div>
+  </div>
+
+  <div class="button-container">
+    <button class="showZombieButton btn btn-primary">Show Zombies</button>
+    <button class="createzombieButton btn btn-dark">Create Zombie</button>
+    <button class="attackZombie btn-danger">Attack</button>
+      <button class="btn btn-outline-success" onclick="changeDnafns()">Change DNA</button>
+      <button class="btn btn-outline-info" onclick="changeNamefns()">Change Name</button>
+  <div>  
+    <button class="levelupButton btn-green" onclick="levelUp()">Level Up</button>
+    <button class="levelDownBtn btn-danger" onclick="levelDown()">Level Down</button>
+  </div>
+  </div>
+
+  <div id="zombieNameDiv" style="display: none">
+    <input type="text" name="zombieName" id="zombieName">
+    <button class="submitName">Submit</button>
+  </div>
+
+  <div class="toast-container">
+    <div class="toast" data-autohide="false">
+      <div class="toast-header">
+        <strong class="mr-auto">Notification</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body" style="color: Black">
+        Hello, this is a toast message!
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cdnUrls = [
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729577735/w1j9eaigkd8scqbwavyl.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729577735/fggjtg050nulw5gvar5b.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729577734/tsytcwvwsecr6zngoyqe.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729577734/xvh5q7eibppbx6odgsiv.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729581909/t05ejhgj592lcq7ydfrl.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729581909/pm6zkz8s0jbuaizir2sf.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729582293/zombies12_zfscgd.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729582293/zombies11_bo2ydf.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729583048/zombies19_heonpd.jpg',
+      'https://res.cloudinary.com/djbpywyws/image/upload/v1729583111/haloween10_bi6u5g.jpg'
+    ];
+    function getRandomCdn() {
+      const randomIndex = Math.floor(Math.random() * cdnUrls.length);
+      return cdnUrls[randomIndex];
+    }
+
+    var cryptoZombies;
+    var userAccount;
+    var levelupButton;
+    var levelDownBtn;
+    var changeName;
+    var changeZombieDna;
+    var submitDnaBtn;
+    const showZombieButton = document.querySelector('.showZombieButton');
+    const createzombieButton = document.querySelector('.createzombieButton');
+    const submitNameBtn = document.querySelector(".submitName");
+    const attackZombie = document.querySelector(".attackZombie");
+    var zombieCount = 459;
+
+    function startApp() {
+
+      var cryptoZombiesAddress = "0x231aA8f7d1165c78eaa4Ee6d2D33D0b18324423d";
+
+      cryptoZombies = new web3.eth.Contract(cryptoZombiesABI, cryptoZombiesAddress);
+
+
+      cryptoZombies.events.Transfer({ filter: { _to: userAccount } })
+        .on("data", function (event) {
+          let data = event.returnValues;
+          getZombiesByOwner(userAccount).then(displayZombies);
+        }).on("error", console.error);
+    }
+
+    function displayZombies(ids) {
+      $("#zombies").empty();
+
+      for (let id of ids) {
+
+        getZombieDetails(id)
+          .then(function (zombie) {
+            const randomCdnUrl = getRandomCdn();
+             $("#zombies").append(`
+             <div class="zombie" style='border: 5px solid darkolivegreen;margin-left: 11px;'>
+             <img src="${randomCdnUrl}" alt="Zombie Image" style="width: 100px; height: 100px;border-left:20px;padding-left:22px">
+             <ul>
+             <li>Name: ${zombie.name}</li>
+             <li>DNA: ${zombie.dna}</li>
+             <li>Level: ${zombie.level}</li>
+             <li>Wins: ${zombie.winCount}</li>
+             <li>Losses: ${zombie.lossCount}</li>
+             <li>Ready Time: ${zombie.readyTime}</li>
+             </ul>
+            `);
+          });
+      }
+
+    }
+
+    function createRandomZombie(name) {
+      name = "Zombie" + zombieCount;
+      zombieCount = zombieCount + 1;
+      $('.toast').toast('show');
+      $('.toast-body').text("Creating new zombie on the blockchain. This may take a while...");
+      return cryptoZombies.methods.createRandomZombie(name)
+        .send({ from: userAccount })
+        .on("receipt", function (receipt) {
+          $('.toast').toast('show');
+          $('.toast-body').text("Successfully created " + name + "!");
+          getZombiesByOwner(userAccount).then(displayZombies)
+        })
+        .on("error", function (error) {
+          console.log(error);
+        });
+    }
+
+    function feedOnKitty(zombieId, kittyId) {
+      $("#txStatus").text("Eating a kitty. This may take a while...");
+      return cryptoZombies.methods.feedOnKitty(zombieId, kittyId)
+        .send({ from: userAccount })
+        .on("receipt", function (receipt) {
+          $("#txStatus").text("Ate a kitty and spawned a new Zombie!");
+          getZombiesByOwner(userAccount).then(displayZombies);
+        })
+        .on("error", function (error) {
+          $("#txStatus").text(error);
+        });
+    }
+
+    async function changeDnafns() {
+  const zombieId = prompt("Please enter the Zombie ID:");
+  if (zombieId) {
+    const newDna = prompt("Please enter the new DNA value:");
+    if (newDna) {
+      $('.toast').toast('show');
+      $('.toast-body').text("Zombie DNA Changing");
+      return cryptoZombies.methods.changeDna(zombieId, newDna)
+        .send({ from: userAccount })
+        .on("receipt", function (receipt) {
+          $('.toast').toast('show');
+          $('.toast-body').text("Zombie DNA Changed");
+        })
+        .on("error", function (error) {
+          console.log(error);
+        });
+    } else {
+      console.log("New DNA value not provided.");
+    }
+  } else {
+    console.log("Zombie ID not provided.");
+  }
+}
+
+function levelUp() {
+  const zombieId = prompt("Please enter the ZombieID you want to level up:");
+  if (zombieId) {
+    $('.toast').toast('show');
+    $('.toast-body').text("Leveling up your zombie...");
+    return cryptoZombies.methods.levelUp(zombieId)
+      .send({ from: userAccount, value: web3.utils.toWei("0.001", "ether") })
+      .on("receipt", function (receipt) {
+        $('.toast').toast('show');
+        $('.toast-body').text("Power overwhelming! Zombie successfully leveled up");
+      })
+      .on("error", function (error) {
+        console.log(error);
+      });
+  } else {
+    console.log("Zombie ID not provided.");
+  }
+}
+
+function levelDown() {
+  const zombieId = prompt("Please enter the ZombieID you want to level down:");
+  if (zombieId) {
+    $('.toast').toast('show');
+    $('.toast-body').text("Leveling Down your zombie...");
+    return cryptoZombies.methods.levelDown(zombieId) 
+      .send({ from: userAccount, value: web3.utils.toWei("0.001", "ether") })
+      .on("receipt", function (receipt) {
+        $('.toast').toast('show');
+        $('.toast-body').text("Power downsizing! Zombie successfully leveled Down");
+      })
+      .on("error", function (error) {
+        console.log(error);
+      });
+  } else {
+    console.log("Zombie ID not provided.");
+  }
+}
+
+    async function attackZombieFns(zombieId, targetId) {
+      zombieId = 0;
+      targetId = 1;
+      $('.toast').toast('show');
+      $('.toast-body').text("Under Attack");
+      return cryptoZombies.methods.attack(zombieId, targetId)
+        .send({ from: userAccount })
+        .on("receipt", function (receipt) {
+          $('.toast').toast('show');
+          $('.toast-body').text("Attack Successful");
+        })
+        .on("error", function (error) {
+          console.log(error);
+        });
+    }
+
+    function changeNamefns() {
+  const zombieId = prompt("Please enter the Zombie ID:");
+  if (zombieId) {
+    const newName = prompt("Please enter the new name for your zombie:");
+    if (newName) {
+      $('.toast').toast('show');
+      $('.toast-body').text("Changing Name for your zombie...");
+      return cryptoZombies.methods.changeName(zombieId, newName)
+        .send({ from: userAccount })
+        .on("receipt", function (receipt) {
+          $('.toast').toast('show');
+          $('.toast-body').text("Zombie Name Changed");
+        })
+        .on("error", function (error) {
+          console.log(error);
+        });
+    } else {
+      console.log("New name not provided.");
+    }
+  } else {
+    console.log("Zombie ID not provided.");
+  }
+}
+
+    function getZombieDetails(id) {
+      return cryptoZombies.methods.zombies(id).call()
+    }
+
+    function zombieToOwner(id) {
+      return cryptoZombies.methods.zombieToOwner(id).call()
+    }
+
+    function getZombiesByOwner(owner) {
+      return cryptoZombies.methods.getZombiesByOwner(owner).call()
+    }
+
+    window.addEventListener('load', async () => {
+      if (window.ethereum) {
+        window.web3 = new Web3(ethereum);
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userAccount = accounts[0];
+          startApp()
+        } catch (error) {
+        }
+      }
+
+      else if (window.web3) {
+        window.web3 = new Web3(web3.currentProvider);
+
+        userAccount = web3.eth.accounts[0];
+        startApp()
+      }
+
+      else {
+        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+      }
+    });
+
+    ethereum.on('accountsChanged', (accounts) => {
+      window.location.reload();
+    });
+
+    ethereum.on('chainChanged', (chainId) => {
+      window.location.reload();
+    });
+
+    showZombieButton.addEventListener('click', () => {
+      getZombiesByOwner(userAccount)
+        .then(displayZombies);
+    });
+
+    createzombieButton.addEventListener('click', () => {
+      createRandomZombie(userAccount);
+    });
+
+    attackZombie.addEventListener('click', () => {
+      getZombiesByOwner(userAccount).then(attackZombieFns);
+    })
+
+
+  </script>
+</body>
+
+</html>

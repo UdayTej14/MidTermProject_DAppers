@@ -1,0 +1,114 @@
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.status-bar {
+    background: #00c6ff;
+    color: #fff;
+    padding: 10px;
+    width: 80%;
+    text-align: center;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 198, 255, 0.6);
+}
+
+
+.zombies-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 80%;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.zombie {
+    background: #243B55;
+    border: 2px solid #00c6ff;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    width: 200px;
+    text-align: left;
+    box-shadow: 0 4px 20px rgba(0, 198, 255, 0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.zombie:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(0, 198, 255, 0.7);
+}
+
+.zombie ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zombie li {
+    margin-bottom: 8px;
+}
+
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.button {
+    padding: 15px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0px 4px 15px rgba(0, 198, 255, 0.6);
+    transition: background 0.3s, transform 0.3s;
+}
+
+.button:hover {
+    background: linear-gradient(to right, #0072ff, #00c6ff);
+    transform: translateY(-3px);
+}
+
+.button:active {
+    transform: translateY(1px);
+}
+
+
+.zombies-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.zombies-container::-webkit-scrollbar-thumb {
+    background: #00c6ff;
+    border-radius: 10px;
+}
+
+.zombies-container::-webkit-scrollbar-track {
+    background: #141E30;
+}
+.createzombieButton{
+    margin: 20px;
+}

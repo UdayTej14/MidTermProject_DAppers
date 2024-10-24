@@ -1,0 +1,80 @@
+body {
+    background-color: black;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Change to column to align elements vertically */
+    justify-content: flex-start; /* Push items to the top */
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    position: relative;
+    color: white;
+  }
+  
+  .button-container {
+    text-align: center;
+    border: 2px solid #928f8f;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    z-index: 2;
+    margin-top: 20px;
+  }
+  
+  .button-container button {
+    margin: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  #zombieImage, #levelUpImage {
+    position: relative; /* Change from absolute to relative */
+    width: 100px; /* Adjust image width as needed */
+    display: block; /* Ensure the images are shown as block elements */
+    margin-top: 20px; /* Add space between buttons and zombies */
+  }
+  .row-flex{
+    display: flex;
+    flex: flex-wrap;
+  }
+  .zombies-info {
+    display: block;
+    margin-top: 30px;
+    width: 100px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 1;
+    color: white;
+  }
+  
+  .zombie-box {
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 50px; /* Adjust the margin to position zombies below buttons */
+  }
+  
+  .toast-container {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    margin-bottom: 20px;
+    z-index: 1050;
+  }
+  
+  .title {
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 50px;
+    color: white;
+    animation: bounce 1s infinite alternate;
+  }
+  
